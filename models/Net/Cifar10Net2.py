@@ -1,8 +1,8 @@
-from BasicBlock import BasicBlock
+from models.Net.BasicBlock import BasicBlock
 import torch
 from torch import Tensor
 import torch.nn as nn
-from typing import Type, Any, Callable, Union, List, Optional
+from typing import Type, Any, Callable, List, Optional
 
 
 def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:

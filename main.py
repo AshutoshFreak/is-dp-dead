@@ -1,6 +1,4 @@
-import Net
-import numpy as np
-import opacus
+import models.FullResNet.FullResNet as ChozenModel
 from opacus.validators import ModuleValidator
 from opacus import PrivacyEngine
 from opacus.grad_sample import GradSampleModule
@@ -66,7 +64,7 @@ def train(model, criterion, optimizer, train_loader, epoch, device):
 
 def main():
     train_dl, test_dl, val_dl = get_dataloders()
-    model = Net.getModel()
+    model = ChozenModel.getModel()
     if use_differential_privacy:
         print("Using Differential Privacy")
         if not isinstance(model, GradSampleModule):
@@ -104,6 +102,9 @@ def main():
         with torch.no_grad():
             # Calculate train accuracy
             for images, labels in train_dl:
+                images = images.to(device)
+                labels = labels.to(device)
+
                 outputs = model(images)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -113,6 +114,9 @@ def main():
 
             # Calculate test accuracy
             for images, labels in test_dl:
+                images = images.to(device)
+                labels = labels.to(device)
+
                 outputs = model(images)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -133,6 +137,8 @@ def main():
     print(f"Test Accuracies = {test_accuracies}")
     if use_differential_privacy:
         print(f"Epsilons = {epsilons}")
+
+    torch.save(model.state_dict(), "./trained_models/model_weights.pth")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
-from BasicBlock import BasicBlock
 import torch.nn as nn
 from torch import Tensor
-from typing import Type, Any, Callable, Union, List, Optional
+from typing import Callable, List, Optional
 
 
 class ResNet1(nn.Module):
