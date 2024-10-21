@@ -178,7 +178,7 @@ def main():
     if args.save_model_path != "":
         torch.save(
             model.state_dict(),
-            f"{args.save_model_path}/FullResNet_e{epsilon}_d{delta}.pth",
+            f"{args.save_model_path}/FullResNet_e{args.epsilon}.pth",
         )
 
 
