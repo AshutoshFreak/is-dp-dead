@@ -1,5 +1,5 @@
-import Cifar10Net1
-import Cifar10Net2
+import models.Net.Cifar10Net1 as Cifar10Net1
+import models.Net.Cifar10Net2 as Cifar10Net2
 import torch.nn as nn
 
 
