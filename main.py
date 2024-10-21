@@ -63,8 +63,6 @@ def train(model, criterion, optimizer, train_loader, epoch, device):
         loss.backward()
         optimizer.step()
 
-        print(f"Step: {i}")
-
 
 def main():
     train_dl, test_dl, val_dl = get_dataloders()
@@ -87,13 +85,54 @@ def main():
             epochs=EPOCHS,
             target_epsilon=EPSILON,
             target_delta=DELTA,
-            max_grad_norm=1.0,
+            max_grad_norm=MAX_GRAD_NORM,
         )
 
     model = model.to(device)
 
+    train_accuracies = []
+    test_accuracies = []
+    epsilons = []
+
     for epoch in tqdm(range(EPOCHS), desc="Epoch", unit="epoch"):
         train(model, criterion, optimizer, train_dl, epoch + 1, device)
+
+        # Calculate test and train accuracy for each epoch
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            # Calculate train accuracy
+            for images, labels in train_dl:
+                outputs = model(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+            train_accuracy = correct / total * 100
+            train_accuracies.append(train_accuracy)
+
+            # Calculate test accuracy
+            for images, labels in test_dl:
+                outputs = model(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+            test_accuracy = correct / total * 100
+            test_accuracies.append(test_accuracy)
+
+            if use_differential_privacy:
+                # Get epsilon
+                epsilon = privacy_engine.get_epsilon(DELTA)
+                epsilons.append(epsilon)
+            print(f"Epoch: {epoch}")
+            print(f"Train Accuracy: {train_accuracy}")
+            print(f"Test Accuracy: {test_accuracy}")
+            if use_differential_privacy:
+                print(f"ε = {epsilon:.2f}, δ = {DELTA}")
+    print(f"Train Accuracies = {train_accuracies}")
+    print(f"Test Accuracies = {test_accuracies}")
+    if use_differential_privacy:
+        print(f"Epsilons = {epsilons}")
 
 
 if __name__ == "__main__":
