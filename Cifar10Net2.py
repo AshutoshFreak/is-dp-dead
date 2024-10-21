@@ -41,7 +41,7 @@ class ResNet2(nn.Module):
             )
         self.groups = groups
         self.base_width = width_per_group
-        self.layer1 = self._make_layer(block, 64, layers[0], avoid_norm=True)
+        self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(
             block, 128, layers[1], dilate=replace_stride_with_dilation[0]
         )
