@@ -1,3 +1,4 @@
+import torch
 import models.Net.Cifar10Net1 as Cifar10Net1
 import models.Net.Cifar10Net2 as Cifar10Net2
 import torch.nn as nn
@@ -35,7 +36,10 @@ class Net(nn.Module):
         return x
 
 
-def getModel():
+def getModel(pretrained_path: str = ""):
+    if pretrained_path != "":
+        model = torch.load(pretrained_path)
+        return model
     encoder = Encoder()
     decider = Decider()
     return Net(encoder, decider)

@@ -50,6 +50,9 @@ def parse_args():
     parser.add_argument(
         "--save_model_path", type=str, default="", help="Save directory for model"
     )
+    parser.add_argument(
+        "--pretrained_path", type=str, default="", help="Load pretrained model"
+    )
 
     args = parser.parse_args()
 
@@ -99,7 +102,7 @@ def train(model, criterion, optimizer, train_loader, epoch, device):
 def main():
     args = parse_args()
     train_dl, test_dl, val_dl = get_dataloders()
-    model = ChozenModel.getModel()
+    model = ChozenModel.getModel(pretrained_path=args.pretrained_path)
     if args.use_differential_privacy:
         print("Using Differential Privacy.")
         print(f"Target Epsilon = {args.epsilon}")
