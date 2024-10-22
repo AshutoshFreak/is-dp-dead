@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from models.FullResNet.ResNet_Part1 import ResNet_Part1
 from models.FullResNet.ResNet_Part2 import ResNet_Part2
@@ -26,7 +27,11 @@ class FullResNet(nn.Module):
         return x
 
 
-def getModel():
+def getModel(pretrained_path: str = ""):
+    if pretrained_path != "":
+        model = torch.load(pretrained_path)
+        return model
+
     model_part1 = ResNet_Part1()
     model_layer2 = CustomBlock(64, 128)
     model_layer3 = CustomBlock(128, 256)
