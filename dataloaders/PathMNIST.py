@@ -1,6 +1,8 @@
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+import torchvision.transforms as tt
 
 
 class PathMNIST(Dataset):
@@ -50,3 +52,18 @@ class PathMNIST(Dataset):
 
     def __len__(self):
         return self.img.shape[0]
+
+
+def get_dataloders():
+    light_transform = tt.Compose(
+        [tt.ToTensor(), tt.Lambda(lambda x: (x - x.mean()) / (x.std()))]
+    )
+
+    train_ds = PathMNIST(split="train", transforms=[light_transform])
+    val_ds = PathMNIST(split="val", transforms=[light_transform])
+    test_ds = PathMNIST(split="test", transforms=[light_transform])
+    train_dl = DataLoader(train_ds, 20, shuffle=True, num_workers=4, pin_memory=True)
+    test_dl = DataLoader(test_ds, 20, True, num_workers=4, pin_memory=True)
+    val_dl = DataLoader(val_ds, 20, True, num_workers=4, pin_memory=True)
+
+    return train_dl, test_dl, val_dl

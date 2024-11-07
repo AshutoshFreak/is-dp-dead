@@ -1,3 +1,5 @@
+"""Taken from https://www.kaggle.com/code/drvaibhavkumar/alexnet-in-pytorch-cifar10-clas-83-test-accuracy"""
+
 import torch
 import torch.nn as nn
 

@@ -1,14 +1,11 @@
 import argparse
-import models.FullResNet.FullResNet as ChozenModel
+from importlib import import_module
 from opacus.validators import ModuleValidator
 from opacus import PrivacyEngine
 from opacus.grad_sample import GradSampleModule
-from PathMNIST import PathMNIST
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
-import torchvision.transforms as tt
 from tqdm import tqdm
 import warnings
 
@@ -24,22 +21,10 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 def parse_args():
     parser = argparse.ArgumentParser(description="Command line parameters.")
     parser.add_argument(
-        "--epochs", type=int, default=20, help="Number of epochs (default: 20)"
-    )
-    parser.add_argument(
-        "--lr", type=float, default=1e-3, help="Learning rate (default: 1e-3)"
-    )
-    parser.add_argument(
-        "--use_differential_privacy",
-        action="store_true",
-        default=False,
-        help="Use differential privacy (default: False)",
-    )
-    parser.add_argument(
-        "--epsilon",
-        type=float,
-        default=10.0,
-        help="Epsilon value (default: 10.0). Required if use_differential_privacy is True",
+        "--data",
+        type=str,
+        default="CIFAR10",
+        help="Chooze dataset to be used for training.",
     )
     parser.add_argument(
         "--delta",
@@ -48,10 +33,37 @@ def parse_args():
         help="Delta value (default: 1e-5). Required if use_differential_privacy is True",
     )
     parser.add_argument(
-        "--save_model_path", type=str, default="", help="Save directory for model"
+        "--epochs", type=int, default=20, help="Number of epochs (default: 20)"
+    )
+    parser.add_argument(
+        "--epsilon",
+        type=float,
+        default=10.0,
+        help="Epsilon value (default: 10.0). Required if use_differential_privacy is True",
+    )
+    parser.add_argument(
+        "--lr", type=float, default=1e-3, help="Learning rate (default: 1e-3)"
+    )
+    parser.add_argument(
+        "--max_grad_norm",
+        type=float,
+        default=1,
+        help="Max grad norm for Differential Privacy (default: 1)",
+    )
+    parser.add_argument(
+        "--model", type=str, default="AlexNet", help="Chooze model (default: AlexNet)"
     )
     parser.add_argument(
         "--pretrained_path", type=str, default="", help="Load pretrained model"
+    )
+    parser.add_argument(
+        "--save_model_path", type=str, default="", help="Save directory for model"
+    )
+    parser.add_argument(
+        "--use_differential_privacy",
+        action="store_true",
+        default=False,
+        help="Use differential privacy (default: False)",
     )
 
     args = parser.parse_args()
@@ -70,21 +82,6 @@ def accuracy(preds, labels):
     return (preds == labels).mean()
 
 
-def get_dataloders():
-    light_transform = tt.Compose(
-        [tt.ToTensor(), tt.Lambda(lambda x: (x - x.mean()) / (x.std()))]
-    )
-
-    train_ds = PathMNIST(split="train", transforms=[light_transform])
-    val_ds = PathMNIST(split="val", transforms=[light_transform])
-    test_ds = PathMNIST(split="test", transforms=[light_transform])
-    train_dl = DataLoader(train_ds, 20, shuffle=True, num_workers=4, pin_memory=True)
-    test_dl = DataLoader(test_ds, 20, True, num_workers=4, pin_memory=True)
-    val_dl = DataLoader(val_ds, 20, True, num_workers=4, pin_memory=True)
-
-    return train_dl, test_dl, val_dl
-
-
 def train(model, criterion, optimizer, train_loader, epoch, device):
     model.train()
     for i, (images, target) in enumerate(train_loader):
@@ -101,7 +98,9 @@ def train(model, criterion, optimizer, train_loader, epoch, device):
 
 def main():
     args = parse_args()
-    train_dl, test_dl, val_dl = get_dataloders()
+    ChozenModel = import_module(f"models.{args.model}.{args.model}")
+    ChozenData = import_module(f"dataloaders.{args.data}")
+    train_dl, test_dl, val_dl = ChozenData.get_dataloaders()
     model = ChozenModel.getModel(pretrained_path=args.pretrained_path)
     if args.use_differential_privacy:
         print("Using Differential Privacy.")
