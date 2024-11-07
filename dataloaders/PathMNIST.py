@@ -54,7 +54,7 @@ class PathMNIST(Dataset):
         return self.img.shape[0]
 
 
-def get_dataloders():
+def get_dataloaders():
     light_transform = tt.Compose(
         [tt.ToTensor(), tt.Lambda(lambda x: (x - x.mean()) / (x.std()))]
     )
