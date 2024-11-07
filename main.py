@@ -81,7 +81,7 @@ def accuracy(preds, labels):
 
 def train(model, criterion, optimizer, train_loader, epoch, device):
     model.train()
-    for images, target in tqdm(train_loader, desc="Iter", unit="iter"):
+    for images, target in tqdm(train_loader, desc="Iter", unit="iter", miniters=1000):
         images = images.to(device)
         target = target.to(device)
 
