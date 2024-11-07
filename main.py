@@ -180,7 +180,7 @@ def main():
     if args.save_model_path != "":
         torch.save(
             model.state_dict(),
-            f"{args.save_model_path}/FullResNet_e{args.epsilon}.pth",
+            f"{args.save_model_path}/{args.model}_e{args.epsilon}.pth",
         )
 
 
