@@ -11,9 +11,6 @@ import warnings
 
 warnings.simplefilter("ignore")
 
-# Hyperparameters
-MAX_GRAD_NORM = 1.2
-
 # Device
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -122,7 +119,7 @@ def main():
             epochs=args.epochs,
             target_epsilon=args.epsilon,
             target_delta=args.delta,
-            max_grad_norm=MAX_GRAD_NORM,
+            max_grad_norm=args.max_grad_norm,
         )
 
     model = model.to(device)
